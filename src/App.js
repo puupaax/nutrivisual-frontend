@@ -2,11 +2,27 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
 
+
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  Text,
+  LabelList,
+  CartesianGrid,
+  ResponsiveContainer
+} from 'recharts';
+
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [gender, setGender] = useState(""); 
+  const [ageRange, setAgeRange] = useState(""); 
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/*": [] },
@@ -19,16 +35,21 @@ function App() {
     },
   });
 
+  const handleGenderChange = (e) => setGender(e.target.value); 
+  const handleAgeRangeChange = (e) => setAgeRange(e.target.value); 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedFile) return;
 
     const formData = new FormData();
     formData.append("file", selectedFile);
+    formData.append("gender", gender); 
+    formData.append("age_range", ageRange); 
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:8000/detect/", formData, {
+      const response = await axios.post("http://192.168.18.6:8000/detect/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResults(response.data);
@@ -40,17 +61,65 @@ function App() {
     }
   };
 
+  const chartData = [
+    {
+      name: "Energi Total",
+      nilai: results?.data?.energi_total ?? 0,
+      batas: results?.data?.batas_energi_total ?? 0,
+    },
+    {
+      name: "Garam",
+      nilai: results?.data?.garam ?? 0,
+      batas: results?.data?.batas_garam ?? 0,
+    },
+    {
+      name: "Gula",
+      nilai: results?.data?.gula ?? 0,
+      batas: results?.data?.batas_gula ?? 0,
+    },
+    {
+      name: "Karbohidrat",
+      nilai: results?.data?.karbohidrat_total ?? 0,
+      batas: results?.data?.batas_karbohidrat_total ?? 0,
+    },
+    {
+      name: "Lemak Total",
+      nilai: results?.data?.lemak_total ?? 0,
+      batas: results?.data?.batas_lemak_total ?? 0,
+    },
+    {
+      name: "Lemak Jenuh",
+      nilai: results?.data?.lemak_jenuh ?? 0,
+      batas: results?.data?.batas_lemak_jenuh ?? 0,
+    },
+    {
+      name: "Protein",
+      nilai: results?.data?.protein ?? 0,
+      batas: results?.data?.batas_protein ?? 0,
+    },
+  ];
+
+  const giziList = [
+    { label: "Total Kalori", value: results?.data?.energi_total, batas: results?.data?.batas_energi_total },
+    { label: "Garam", value: results?.data?.garam, batas: results?.data?.batas_garam },
+    { label: "Gula", value: results?.data?.gula, batas: results?.data?.batas_gula },
+    { label: "Karbohidrat Total", value: results?.data?.karbohidrat_total, batas: results?.data?.batas_karbohidrat_total },
+    { label: "Lemak Jenuh", value: results?.data?.lemak_jenuh, batas: results?.data?.batas_lemak_jenuh },
+    { label: "Lemak Total", value: results?.data?.lemak_total, batas: results?.data?.batas_lemak_total },
+    { label: "Protein", value: results?.data?.protein, batas: results?.data?.batas_protein },
+  ];
+  
+
   return (
     <div className="min-h-screen bg-[#f9f9f9] font-sans">
       {/* Header */}
       <header className="w-full flex justify-center items-center px-12 py-6 bg-white shadow-sm fixed top-0 left-0 z-10">
-        <nav className="flex gap-20 text-gray-700 font-medium">
+        <nav className="flex gap-10 text-gray-700 font-medium">
           <a href="#visualisasi" className="hover:text-[#2f855a]">Visualisasi</a>
           <a href="#teknologi" className="hover:text-[#2f855a]">Teknologi</a>
           <a href="#referensi" className="hover:text-[#2f855a]">Referensi</a>
         </nav>
       </header>
-
 
       {/* Main Section */}
       <main className="pt-32 px-8 max-w-7xl mx-auto space-y-10">
@@ -70,17 +139,17 @@ function App() {
               <strong>Kesulitan dalam membaca tabel gizi pada produk kemasan? </strong>
                Upload gambar tabel informasi nilai gizi produk yang mau kamu beli untuk mengetahui seberapa besar kandungan gizi didalamnya menggunakan pendekatan yang sederhana dan mudah dipahami!. 
             </p>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white shadow-xl rounded-2xl p-4">
-                <p className="text-[#2f855a] mt-0 mb-0 text-sm text-center "> Visualisasi menggunakan istilah dan takaran yang digunakan sehari-hari.</p>
+            <div className="mt-8 flex flex-col sm:flex-row text-[#2f855a] text-sm text-center">
+              <div className="flex-1 flex items-center justify-center px-4 py-6">
+                <p>Visualisasi menggunakan istilah dan takaran yang digunakan sehari-hari.</p>
               </div>
 
-              <div className="bg-white shadow-xl rounded-2xl p-4">
-                <p className="text-[#2f855a] mt-0 mb-0 text-sm text-center ">Visualisasi menggunakan bahan makanan setara.</p>
+              <div className="flex-1 flex items-center justify-center px-4 py-6 border-t sm:border-t-0 sm:border-l border-gray-300">
+                <p>Visualisasi menggunakan bahan makanan setara.</p>
               </div>
 
-              <div className="bg-white shadow-xl rounded-2xl p-4">
-                <p className="text-[#2f855a] mt-0 mb-0 text-sm text-center ">Perbandingan dengan anjuran/batas konsumsi harian.</p>
+              <div className="flex-1 flex items-center justify-center px-4 py-6 border-t sm:border-t-0 sm:border-l border-gray-300">
+                <p>Perbandingan dengan anjuran/batas konsumsi harian.</p>
               </div>
             </div>
           </div>
@@ -114,19 +183,30 @@ function App() {
 
               {/* Dropdowns */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <select className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700" defaultValue="">
+                <select
+                  className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700"
+                  value={gender}
+                  onChange={handleGenderChange}
+                >
                   <option value="" disabled>Jenis Kelamin</option>
-                  <option value="Laki-laki">Laki-laki</option>
-                  <option value="Perempuan">Perempuan</option>
+                  <option value="laki_laki">Laki-laki</option>
+                  <option value="perempuan">Perempuan</option>
                 </select>
 
-                <select className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700" defaultValue="">
+                <select
+                  className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700"
+                  value={ageRange}
+                  onChange={handleAgeRangeChange}
+                >
                   <option value="" disabled>Range Usia</option>
-                  <option value="0-5">0–5 tahun</option>
-                  <option value="6-12">6–12 tahun</option>
-                  <option value="13-18">13–18 tahun</option>
-                  <option value="19-59">19–59 tahun</option>
-                  <option value="60+">60+ tahun</option>
+                  <option value="10_12_tahun">10–12 tahun</option>
+                  <option value="13_15_tahun">13–15 tahun</option>
+                  <option value="16_18_tahun">16–18 tahun</option>
+                  <option value="19_29_tahun">19–29 tahun</option>
+                  <option value="30_49_tahun">30-49 tahun</option>
+                  <option value="50_64_tahun">50-64 tahun</option>
+                  <option value="65_80_tahun">65-80  tahun</option>
+                  <option value="80_plus_tahun">80+ tahun</option>
                 </select>
               </div>
 
@@ -135,43 +215,232 @@ function App() {
                 type="submit"
                 className="bg-[#2f855a] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#276749] w-full"
               >
-                Kirim
+                Deteksi
               </button>
             </form>
             {loading && <p className="italic text-gray-600 text-center">Memproses gambar...</p>}
           </div>
         </div>
 
+        {/* Hasil Visualisasi */}
         <div className="w-full bg-[#f4ecd8] p-8">
           <h3 className="text-xl font-bold text-[#2f855a] mb-4">Hasil Visualisasi</h3>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+            {[
+              { label: 'Sajian per Kemasan', value: results?.data?.sajian_per_kemasan ?? 0, unit: 'sajian' },
+              { label: 'Energi Total', value: results?.data?.energi_total ?? 0, unit: 'kkal' },
+              { label: 'Lemak Total', value: results?.data?.lemak_total ?? 0, unit: 'gram' },
+              { label: 'Lemak Jenuh', value: results?.data?.lemak_jenuh ?? 0, unit: 'gram' },
+              { label: 'Protein', value: results?.data?.protein ?? 0, unit: 'gram' },
+              { label: 'Karbohidrat', value: results?.data?.karbohidrat_total ?? 0, unit: 'gram' },
+              { label: 'Gula', value: results?.data?.gula ?? 0, unit: 'gram' },
+              { label: 'Garam', value: results?.data?.garam ?? 0, unit: 'miligram' },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-xl w-full aspect-square flex flex-col justify-center items-center p-2"
+              >
+                <p className="text-gray-500 text-xs sm:text-sm text-center">{item.label}</p>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-500 leading-tight text-center">
+                  {item.value}
+                </h2>
+                <p className="text-gray-500 text-xs sm:text-sm text-center">{item.unit}</p>
+              </div>
+            ))}
+          </div>
+          
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Box - Hasil Deteksi */}
-            <div className="lg:w-1/2 w-full bg-white shadow-xl rounded-2xl p-6">
-              {loading && <p className="italic text-gray-600">Memproses gambar...</p>}
-              {results ? (
-                <ul className="list-disc ml-6 space-y-1">
-                  {Object.entries(results).map(([label, value]) => (
-                    <li key={label}>
-                      <strong>{label}</strong>: {value}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 italic">Hasil akan ditampilkan disini….</p>
-              )}
+            <div className="lg:w-1/2 w-full bg-white shadow-xl rounded-2xl p-6 flex flex-col">
+              <div className="flex items-center justify-center space-x-4 text-sm text-gray-600 mb-6">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-[#8884d8] rounded-sm" />
+                  <span>Nilai Gizi</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 bg-[#2f855a] rounded-sm" />
+                  <span>Batas Harian</span>
+                </div>
+              </div>
+              {chartData.map((data, index) => (
+                <div key={index} className="mb-5">
+                  <ResponsiveContainer width="100%" height={100}>
+                    <BarChart data={[data]} layout="vertical">
+                      <Bar dataKey="nilai" fill="#8884d8">
+                        <LabelList dataKey="nilai" position="insideRight" fill="#fff" />
+                      </Bar>
+                      <Bar dataKey="batas" fill="#2f855a">
+                        <LabelList dataKey="batas" position="insideRight" fill="#fff" />
+                      </Bar>
+                      <XAxis type="number" />
+                      <YAxis dataKey="name" type="category" width={85} />
+                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ))}
             </div>
 
             {/* Right Box - Comparison */}
-            <div className="lg:w-1/2 w-full bg-white shadow-xl rounded-2xl p-6">
-              {/* Comparison content goes here */}
-              <p className="text-gray-500 italic">Hasil akan ditampilkan disini….</p>
+            <div className="lg:w-1/2 w-full flex flex-col gap-4">
+              {/* Box Atas (25%) */}
+              <div className="flex-1 bg-white shadow-xl rounded-2xl p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {giziList.map((item, index) => {
+                    let status = "";
+                    let bgColor = "";
+
+                    if (item.value > item.batas) {
+                      status = "Sebaiknya dihindari atau dikurangi.";
+                      bgColor = "#A41C1C";
+                    } else if (item.value > item.batas / 2 && item.value <= item.batas) {
+                      status = "Hindari konsumsi berlebihan";
+                      bgColor = "#F5E045";
+                    } else if (item.value <= item.batas / 2) {
+                      status = "Tetap konsumsi dalam batas aman";
+                      bgColor = "#2f855a";
+                    } else {
+                      status = "-";
+                      bgColor = "#E4E3DF";
+                    }
+
+                    return (
+                      <div 
+                        key={index}
+                        className="flex flex-col justify-between p-4 text-white rounded-md text-sm shadow"
+                        style={{ backgroundColor: bgColor, height: '100%' }} // Tambahin height 100%
+                      >
+                        <h3 className="font-semibold text-sm mb-2">
+                          {item.label}: {((item.value / item.batas) * 100).toFixed(1)}% dari batas harian
+                        </h3>
+                        <p className="text-xs mt-auto">Tips: {status}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Ini bagian perhatian */}
+                <p className="text-xs text-gray-600 mt-6">
+                  <strong>Perhatian:</strong> Asupan harian berasal dari berbagai sumber makanan, bukan hanya ini.
+                </p>
+              </div>
+
+              
+              {/* Box Bawah (75%) */}
+              <div className="flex-[3] bg-white shadow-xl rounded-2xl p-6 flex flex-col justify-start">
+                <div className="flex flex-col md:flex-row w-full relative">
+                  
+                  {/* Kolom Kiri */}
+                  <div className="w-full md:w-1/2 flex flex-col items-center text-gray-600 text-sm px-4">
+                    <h2 className="font-bold mb-2">Kalori setara dengan:</h2>
+                    <p className="text-center">{results?.perbandingan_kalori?.nama ?? '-'}</p>
+                    <p>Nilai Kalori: {results?.perbandingan_kalori?.nilai_kalori ?? 0} kkal</p>
+                    {results?.perbandingan_kalori?.path && (
+                      <img
+                        src={results.perbandingan_kalori.path}
+                        className="w-24 h-24 object-cover rounded-md mt-2"
+                      />
+                    )}
+                  </div>
+
+                  {/* Garis Tengah */}
+                  <div className="hidden md:block absolute top-0 bottom-0 left-1/2 transform -translate-x-1/2 w-px bg-gray-300" />
+
+                  {/* Kolom Kanan */}
+                  <div className="w-full md:w-1/2 flex flex-col items-center text-gray-600 text-sm px-4 mt-6 md:mt-0">
+                    <h2 className="font-bold mb-2">Protein setara dengan:</h2>
+                    <p className="text-center">{results?.perbandingan_protein?.nama ?? '-'}</p>
+                    <p>Nilai Protein: {results?.perbandingan_protein?.nilai_protein ?? 0} g</p>
+                    {results?.perbandingan_protein?.path && (
+                      <img
+                        src={results.perbandingan_protein.path}
+                        className="w-24 h-24 object-cover rounded-md mt-2"
+                      />
+                    )}
+                  </div>
+
+                </div>
+
+                {/* Baris Bawah */}
+                <div className="flex flex-col md:flex-row w-full relative mt-6">
+                  
+                  {/* Kolom Kiri */}
+                  <div className="w-full md:w-1/2 flex flex-col items-center text-gray-600 text-sm px-4">
+                    <h2 className="font-bold mb-2 text-center">Karbohidrat setara dengan:</h2>
+                    <p className="text-center">
+                    {results?.data?.karbohidrat_total ? (
+                      Math.round(42 / results.data.karbohidrat_total) === 1
+                        ? '1 porsi nasi'
+                        : `1/${Math.round(42 / results.data.karbohidrat_total)} porsi nasi`
+                    ) : '-'}
+                    </p>
+                    {results?.perbandingan_kalori?.path && (
+                      <img
+                        src="/asset/nasi putih.jpeg"
+                        className="w-24 h-24 object-cover rounded-md mt-2"
+                      />
+                    )}
+                  </div>
+
+                  {/* Garis Tengah */}
+                  <div className="hidden md:block absolute top-0 bottom-0 left-1/2 transform -translate-x-1/2 w-px bg-gray-300" />
+
+                  {/* Kolom Kanan*/}
+                  <div className="w-full md:w-1/2 flex flex-col items-center text-gray-600 text-sm px-4 mt-6 md:mt-0">
+                    <h2 className="font-bold mb-1 text-center">Gula setara dengan:</h2>
+                    <p className="text-center mb-2">
+                      {results?.data?.gula ? (() => {
+                        const jumlah = 4 / results.data.gula;
+                        const pembulat = Math.round(jumlah);
+
+                        if (pembulat === 1) {
+                          return '1 sendok makan';
+                        } else if (4 % results.data.gula === 0) {
+                          return `${pembulat} sendok makan`;
+                        } else {
+                          return `1/${pembulat} sendok makan`;
+                        }
+                      })() : '-'}
+                    </p>
+                    <h2 className="font-bold mb-1 text-center">Garam setara dengan:</h2>
+                    <p className="text-center mb-2">
+                      {results?.data?.garam ? (() => {
+                        const jumlah = 5000 / results.data.garam;
+                        const pembulat = Math.round(jumlah);
+
+                        if (pembulat === 1) {
+                          return '1 sendok teh';
+                        } else if (5000 % results.data.garam === 0) {
+                          return `${pembulat} sendok teh`;
+                        } else {
+                          return `1/${pembulat} sendok teh`;
+                        }
+                      })() : '-'}
+                    </p>
+                    <h2 className="font-bold mb-1 text-center">Lemak Total setara dengan:</h2>
+                    <p className="text-center mb-2">
+                      {results?.data?.lemak_total ? (() => {
+                        const jumlah = 67 / results.data.lemak_total;
+                        const pembulat = Math.round(jumlah);
+
+                        if (pembulat === 1) {
+                          return '1 sendok makan';
+                        } else if (67 % results.data.lemak_total === 0) {
+                          return `${pembulat} sendok makan`;
+                        } else {
+                          return `1/${pembulat} sendok makan`;
+                        }
+                      })() : '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
       </main>
     </div>
   );
 }
-
 export default App;
