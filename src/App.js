@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useDropzone } from "react-dropzone";
+import { useEffect } from 'react';
 
 
 import {
@@ -9,14 +10,19 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
-  Text,
   LabelList,
   CartesianGrid,
   ResponsiveContainer
 } from 'recharts';
 
 function App() {
+
+  useEffect(() => {
+    document.body.classList.add('scroll-smooth');
+  }, []);
+
+  const [isModalOpen, setIsModalOpen] = useState(false); // Define modal state
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [results, setResults] = useState(null);
@@ -108,6 +114,9 @@ function App() {
     { label: "Lemak Total", value: results?.data?.lemak_total, batas: results?.data?.batas_lemak_total },
     { label: "Protein", value: results?.data?.protein, batas: results?.data?.batas_protein },
   ];
+
+  const openModal = () => setIsModalOpen(true); // Open modal function
+  const closeModal = () => setIsModalOpen(false); // Close modal function
   
 
   return (
@@ -122,7 +131,9 @@ function App() {
       </header>
 
       {/* Main Section */}
+      <section id="visualisasi">
       <main className="pt-32 px-8 max-w-7xl mx-auto space-y-10">
+        
         {/* Top Section: Title + Upload side-by-side */}
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Title and Text */}
@@ -130,10 +141,10 @@ function App() {
             <h2 className="text-4xl md:text-5xl font-bold text-[#2f855a] leading-tight">
               NutriVisual,
               <br />
-              <span className="text-gray-900">Pahami isi di balik label gizi!</span>
+              <span className="text-gray-900">Pahami isi di balik tabel informasi gizi!</span>
             </h2>
             <p className="mt-4 text-gray-600 text-lg">
-              Visualisasi tabel gizi Produk Kemasanmu yang mau kamu beli dengan Deteksi Objek dan Pengenalan Karakter.
+              Visualisasi tabel gizi Produk Kemasan yang mau kamu beli dengan Deteksi Objek dan Pengenalan Karakter.
             </p>
             <p className="mt-4 text-gray-600 text-sm">
               <strong>Kesulitan dalam membaca tabel gizi pada produk kemasan? </strong>
@@ -156,6 +167,35 @@ function App() {
 
           {/* Upload Box */}
           <div className="lg:w-1/2 bg-white shadow-xl rounded-2xl p-8 ">
+              {/* Help Icon and Modal Trigger */}
+              <div className="relative group inline-flex items-center mb-3 ml-2">
+                <p className="mr-2">Lihat panduan</p> {/* Add margin to the right of the text */}
+                <img
+                  src="/asset/question-icon.png"
+                  alt="Help"
+                  className="w-6 h-6 cursor-pointer"
+                  onClick={openModal} // Open modal when clicked
+                />
+              </div>
+
+              {/* Modal */}
+              {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-4 rounded-lg shadow-lg max-w-2xl relative">
+                    <img
+                      src="/asset/guide.png"
+                      alt="Guide"
+                      className="w-full h-auto rounded-lg"
+                    />
+                    <button
+                      onClick={closeModal}
+                      className="absolute top-4 right-4 text-gray-700 text-3xl"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                </div>
+              )}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               {/* Upload Area */}
               <div
@@ -164,7 +204,7 @@ function App() {
                   isDragActive ? "border-yellow-300 bg-yellow-100 text-black" : "border-gray-400"
                 }`}
               >
-                <input {...getInputProps()} />
+                <input {...getInputProps()} required/>
                 {preview ? (
                   <img
                     src={preview}
@@ -174,7 +214,7 @@ function App() {
                 ) : (
                   <>
                     <div className="bg-[#2f855a] text-white px-6 py-2 rounded-full font-semibold">
-                      Upload Gambar
+                      Upload foto tabel
                     </div>
                     <span className="mt-2 text-sm text-gray-500">atau tarik ke sini</span>
                   </>
@@ -187,6 +227,7 @@ function App() {
                   className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700"
                   value={gender}
                   onChange={handleGenderChange}
+                  required
                 >
                   <option value="" disabled>Jenis Kelamin</option>
                   <option value="laki_laki">Laki-laki</option>
@@ -197,6 +238,7 @@ function App() {
                   className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700"
                   value={ageRange}
                   onChange={handleAgeRangeChange}
+                  required
                 >
                   <option value="" disabled>Range Usia</option>
                   <option value="10_12_tahun">10–12 tahun</option>
@@ -283,7 +325,7 @@ function App() {
               ))}
             </div>
 
-            {/* Right Box - Comparison */}
+            {/* Comparison */}
             <div className="lg:w-1/2 w-full flex flex-col gap-4">
               {/* Box Atas (25%) */}
               <div className="flex-1 bg-white shadow-xl rounded-2xl p-6">
@@ -390,48 +432,72 @@ function App() {
                   <div className="w-full md:w-1/2 flex flex-col items-center text-gray-600 text-sm px-4 mt-6 md:mt-0">
                     <h2 className="font-bold mb-1 text-center">Gula setara dengan:</h2>
                     <p className="text-center mb-2">
-                      {results?.data?.gula ? (() => {
-                        const jumlah = 4 / results.data.gula;
-                        const pembulat = Math.round(jumlah);
-
-                        if (pembulat === 1) {
-                          return '1 sendok makan';
-                        } else if (4 % results.data.gula === 0) {
-                          return `${pembulat} sendok makan`;
-                        } else {
-                          return `1/${pembulat} sendok makan`;
-                        }
-                      })() : '-'}
+                    {results?.data?.gula ? (() => {
+                      const jumlahSendok = results.data.gula / 12.5;
+                      const integerPart = Math.floor(jumlahSendok);
+                      const fractionalPart = jumlahSendok - integerPart;
+                      let hasil = '';
+                      if (fractionalPart < 0.2) {
+                        hasil = `${integerPart}`;
+                      } else if (fractionalPart >= 0.2 && fractionalPart < 0.4) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¼`;
+                      } else if (fractionalPart >= 0.4 && fractionalPart < 0.6) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}½`;
+                      } else if (fractionalPart >= 0.6 && fractionalPart < 0.8) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¾`;
+                      } else {
+                        hasil = `${integerPart + 1}`;
+                      }
+                      return hasil ? `${hasil} sendok makan` : '-';
+                    })() : '-'}
                     </p>
                     <h2 className="font-bold mb-1 text-center">Garam setara dengan:</h2>
                     <p className="text-center mb-2">
-                      {results?.data?.garam ? (() => {
-                        const jumlah = 5000 / results.data.garam;
-                        const pembulat = Math.round(jumlah);
+                    {results?.data?.garam ? (() => {
+                      const jumlahSendok = results.data.garam / 2000;
+                      const integerPart = Math.floor(jumlahSendok);
+                      const fractionalPart = jumlahSendok - integerPart;
 
-                        if (pembulat === 1) {
-                          return '1 sendok teh';
-                        } else if (5000 % results.data.garam === 0) {
-                          return `${pembulat} sendok teh`;
-                        } else {
-                          return `1/${pembulat} sendok teh`;
-                        }
-                      })() : '-'}
+                      let hasil = '';
+
+                      if (fractionalPart < 0.2) {
+                        hasil = `${integerPart}`;
+                      } else if (fractionalPart >= 0.2 && fractionalPart < 0.4) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¼`;
+                      } else if (fractionalPart >= 0.4 && fractionalPart < 0.6) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}½`;
+                      } else if (fractionalPart >= 0.6 && fractionalPart < 0.8) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¾`;
+                      } else {
+                        hasil = `${integerPart + 1}`;
+                      }
+
+                      return hasil ? `${hasil} sendok teh` : '-';
+                    })() : '-'}
                     </p>
                     <h2 className="font-bold mb-1 text-center">Lemak Total setara dengan:</h2>
                     <p className="text-center mb-2">
-                      {results?.data?.lemak_total ? (() => {
-                        const jumlah = 67 / results.data.lemak_total;
-                        const pembulat = Math.round(jumlah);
+                    {results?.data?.lemak_total ? (() => {
+                      const jumlahSendok = results.data.lemak_total / 13.4;
+                      const integerPart = Math.floor(jumlahSendok);
+                      const fractionalPart = jumlahSendok - integerPart;
 
-                        if (pembulat === 1) {
-                          return '1 sendok makan';
-                        } else if (67 % results.data.lemak_total === 0) {
-                          return `${pembulat} sendok makan`;
-                        } else {
-                          return `1/${pembulat} sendok makan`;
-                        }
-                      })() : '-'}
+                      let hasil = '';
+
+                      if (fractionalPart < 0.2) {
+                        hasil = `${integerPart}`;
+                      } else if (fractionalPart >= 0.2 && fractionalPart < 0.4) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¼`;
+                      } else if (fractionalPart >= 0.4 && fractionalPart < 0.6) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}½`;
+                      } else if (fractionalPart >= 0.6 && fractionalPart < 0.8) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¾`;
+                      } else {
+                        hasil = `${integerPart + 1}`;
+                      }
+
+                      return hasil ? `${hasil} sendok makan` : '-';
+                    })() : '-'}
                     </p>
                   </div>
                 </div>
@@ -439,7 +505,96 @@ function App() {
             </div>
           </div>
         </div>
+        <section id="teknologi" className="h-1 invisible"></section>
+        {/*area teknologi yg digunakan*/}
+        <section id="konten teknologi" className="w-full bg-gradient-to-l from-[#f4ecd8] to-white py-16 px-8">
+          <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
+              {/* logo */}
+              <div className="bg-white shadow-xl rounded-2xl p-6 flex flex-col lg:flex-row items-center justify-center">
+              <div className="flex-1 flex items-center justify-center px-4 py-6 mb-4 lg:mb-0 lg:mr-4">
+                <img
+                  src="/asset/logo yolo.jpeg"
+                  alt="YOLO Logo"
+                  className="h-32 object-contain transition-transform hover:scale-110"
+                />
+              </div>
+
+              <div className="flex-1 flex items-center justify-center px-4 py-6 lg:border-l lg:border-t-0 border-t border-gray-300">
+                <img
+                  src="/asset/logo ocr.jpg"
+                  alt="EasyOCR Logo"
+                  className="h-32 object-contain transition-transform hover:scale-110"
+                />
+              </div>
+            </div>
+            {/* Title dan Text */}
+            <div className="lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+                <span className="text-[#2f855a]">Teknologi</span><br />
+                <span className="text-gray-900">yang digunakan.</span>
+              </h2>
+              <p className="mt-4 text-gray-600 text-lg">
+                <strong>YOLOv10. </strong>
+                You Only Look Once (YOLO) merupakan pre-trained model yang menghadirkan pendekatan real-time end-to-end untuk deteksi objek.
+                Dalam aplikasi ini model YOLOv10 digunakan untuk mendeteksi keberadaan tabel informasi nilai gizi yang sudah di upload, lalu juga mendeteksi
+                masing-masing nilai gizi yang ada yang selanjutnya akan di proses menggunakan easyOCR.
+              </p>
+              <p className="mt-4 text-gray-600 text-lg">
+                <strong>EasyOCR. </strong>
+                Optical Character Recognition (OCR) adalah proses mengubah teks cetak menjadi format digital yang dapat dibaca oleh komputer,
+                OCR menganalisis gambar untuk mengidentifikasikan karakter, kata, ataupun blok teks satu per satu. Dalam aplikasi ini, easyOCR digunakan
+                untuk melakukan ekstraksi data gizi yang sudah di deteksi sebelumnya, hasil ekstraksi nantinya akan diterapkan aturan untuk mengambil hanya bagian
+                nilai gizinya saja, sehingga data dapat di proses ke tahap selanjutnya yaitu visualisasi.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section id="referensi" className="h-1 invisible"></section>
+
+        {/*area referensi*/}
+        <section id="konten referensi" className="w-full bg-gradient-to-r from-[#f4ecd8] to-white py-16 px-8">
+          <div className="flex flex-col lg:flex-row gap-10 max-w-7xl mx-auto">
+            {/* Title dan Text */}
+            <div className="lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+                <span className="text-[#2f855a]">Referensi</span><br />
+                <span className="text-gray-900">yang digunakan.</span>
+              </h2>
+              <p className="mt-4 text-gray-600 text-lg">
+                <strong>Takaran saji. </strong>
+                Satu sendok makan gula setara dengan 12,5 gram, satu sendok teh garam setara dengan 2000 mg, dan satu sendok makan lemak setara dengan 13,4 gram. 
+                Takaran ini digunakan untuk memudahkan pemahaman jumlah kandungan dalam makanan berdasarkan ukuran rumah tangga sehari-hari.
+              </p>
+              <p className="mt-4 text-gray-600 text-lg">
+                <strong>Kalori dan Protein dalam makanan/minuman. </strong>
+                Referensi nilai kalori dan protein pada makanan/minuman diambil dari daftar konversi zat gizi berdasarkan hasil Susenas Maret 2024 oleh Badan Pusat Statistik.{" "}
+                <a href="https://assets.dataindonesia.id/2025/01/23/1737605184791-81-23.-konsumsi-kalori-dan-protein-penduduk-indonesia-dan-provinsi--maret-2024.pdf#page=147" className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">
+                  lihat disini
+                </a>
+              </p>
+            </div>
+            {/* logo */}
+            <div className="lg:w-1/2 bg-white shadow-xl rounded-2xl p-8 ">
+              <p className="mt-4 text-gray-600 text-lg text-center">
+                <strong>Angka Kecukupan Gizi Harian.</strong>
+              </p>
+              <img
+                src="/asset/akg.png"
+                alt="akg"
+                className="h-100 object-contain mt-4 transition-transform hover:scale-110"
+              />
+            </div>
+          </div>
+        </section>
       </main>
+      </section>
+      <footer className="w-full flex flex-col items-center justify-center px-12 py-6 bg-[#2f855a] shadow-inner mt-10">
+        <img
+          src="/asset/nutri.png"
+          alt="YOLO Logo"
+          className="h-16 object-contain transition-transform hover:scale-110"
+        />
+      </footer>
     </div>
   );
 }
