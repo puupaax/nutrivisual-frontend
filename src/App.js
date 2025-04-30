@@ -339,7 +339,7 @@ function App() {
                       bgColor = "#A41C1C";
                     } else if (item.value > item.batas / 2 && item.value <= item.batas) {
                       status = "Hindari konsumsi berlebihan";
-                      bgColor = "#F5E045";
+                      bgColor = "#FE7743";
                     } else if (item.value <= item.batas / 2) {
                       status = "Tetap konsumsi dalam batas aman";
                       bgColor = "#2f855a";
