@@ -55,7 +55,7 @@ function App() {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://192.168.18.6:8000/detect/", formData, {
+      const response = await axios.post("https://fastapi-production-fbed.up.railway.app/detect/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResults(response.data);
