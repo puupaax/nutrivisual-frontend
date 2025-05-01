@@ -14,6 +14,7 @@
     "react-dropzone": "^14.3.8",
     "react-scripts": "5.0.1",
     "recharts": "^2.15.3",
+    "serve": "^14.2.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
