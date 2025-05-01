@@ -381,6 +381,7 @@ function App() {
                     {results?.perbandingan_kalori?.path && (
                       <img
                         src={results.perbandingan_kalori.path}
+                        alt=""
                         className="w-24 h-24 object-cover rounded-md mt-2"
                       />
                     )}
@@ -397,6 +398,7 @@ function App() {
                     {results?.perbandingan_protein?.path && (
                       <img
                         src={results.perbandingan_protein.path}
+                        alt=""
                         className="w-24 h-24 object-cover rounded-md mt-2"
                       />
                     )}
@@ -420,6 +422,7 @@ function App() {
                     {results?.perbandingan_kalori?.path && (
                       <img
                         src="/asset/nasi putih.jpeg"
+                        alt=""
                         className="w-24 h-24 object-cover rounded-md mt-2"
                       />
                     )}
