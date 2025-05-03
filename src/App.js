@@ -224,7 +224,7 @@ function App() {
               </div>
 
               {/* kamera */}
-              {!preview && (
+              
                 <>
                   <label
                     htmlFor="cameraInput"
@@ -250,7 +250,7 @@ function App() {
                     }}
                   />
                 </>
-              )}
+              
 
               {/* Dropdowns */}
               <div className="flex flex-col sm:flex-row gap-4">
