@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import Webcam from "react-webcam";
+import { useRef} from "react";
 import { useDropzone } from "react-dropzone";
 import { useEffect } from 'react';
 
@@ -117,6 +119,16 @@ function App() {
 
   const openModal = () => setIsModalOpen(true); // Open modal function
   const closeModal = () => setIsModalOpen(false); // Close modal function
+
+  const webcamRef = useRef(null);
+  const [showCamera, setShowCamera] = useState(false);
+
+  const capture = () => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setPreview(imageSrc);
+    setShowCamera(false);
+  };
+
   
 
   return (
@@ -165,6 +177,8 @@ function App() {
             </div>
           </div>
 
+          
+
           {/* Upload Box */}
           <div className="lg:w-1/2 bg-white shadow-xl rounded-2xl p-8 ">
               {/* Help Icon and Modal Trigger */}
@@ -200,11 +214,11 @@ function App() {
               {/* Upload Area */}
               <div
                 {...getRootProps()}
-                className={`w-full h-64  border-2 border-dashed rounded-xl flex flex-col justify-center items-center cursor-pointer transition ${
+                className={`w-full h-64 border-2 border-dashed rounded-xl flex flex-col justify-center items-center cursor-pointer transition ${
                   isDragActive ? "border-yellow-300 bg-yellow-100 text-black" : "border-gray-400"
                 }`}
               >
-                <input {...getInputProps()} required/>
+                <input {...getInputProps()} required />
                 {preview ? (
                   <img
                     src={preview}
@@ -213,6 +227,7 @@ function App() {
                   />
                 ) : (
                   <>
+                    {/* Upload Button */}
                     <div className="bg-[#2f855a] text-white px-6 py-2 rounded-full font-semibold">
                       Upload foto tabel
                     </div>
@@ -220,6 +235,33 @@ function App() {
                   </>
                 )}
               </div>
+
+              {/* Capture Kamera Button - Pindahkan ke luar Dropzone */}
+              {!preview && (
+                <>
+                  <label
+                    htmlFor="cameraInput"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm cursor-pointer self-center"
+                  >
+                    Foto dengan kamera
+                  </label>
+                  <input
+                    id="cameraInput"
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => setPreview(reader.result);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </>
+              )}
 
               {/* Dropdowns */}
               <div className="flex flex-col sm:flex-row gap-4">
@@ -245,9 +287,9 @@ function App() {
                   <option value="13_15_tahun">13–15 tahun</option>
                   <option value="16_18_tahun">16–18 tahun</option>
                   <option value="19_29_tahun">19–29 tahun</option>
-                  <option value="30_49_tahun">30-49 tahun</option>
-                  <option value="50_64_tahun">50-64 tahun</option>
-                  <option value="65_80_tahun">65-80  tahun</option>
+                  <option value="30_49_tahun">30–49 tahun</option>
+                  <option value="50_64_tahun">50–64 tahun</option>
+                  <option value="65_80_tahun">65–80 tahun</option>
                   <option value="80_plus_tahun">80+ tahun</option>
                 </select>
               </div>
@@ -260,7 +302,10 @@ function App() {
                 Deteksi
               </button>
             </form>
+
+            {/* Loading Text */}
             {loading && <p className="italic text-gray-600 text-center">Memproses gambar...</p>}
+
           </div>
         </div>
 
@@ -594,7 +639,7 @@ function App() {
       <footer className="w-full flex flex-col items-center justify-center px-12 py-6 bg-[#2f855a] shadow-inner mt-10">
         <img
           src="/asset/nutri.png"
-          alt="YOLO Logo"
+          alt="logo web"
           className="h-16 object-contain transition-transform hover:scale-110"
         />
       </footer>
