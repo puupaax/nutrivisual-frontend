@@ -24,6 +24,8 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false); // Define modal state
 
   const [selectedFile, setSelectedFile] = useState(null);
+  const [capturedFile, setCapturedFile] = useState(null);
+
   const [preview, setPreview] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -205,7 +207,7 @@ function App() {
                   isDragActive ? "border-yellow-300 bg-yellow-100 text-black" : "border-gray-400"
                 }`}
               >
-                <input {...getInputProps()} required />
+                <input {...getInputProps()} required={!selectedFile} />
                 {preview ? (
                   <img
                     src={preview}
@@ -244,6 +246,8 @@ function App() {
                         const reader = new FileReader();
                         reader.onload = () => setPreview(reader.result);
                         reader.readAsDataURL(file);
+                        setSelectedFile(file); 
+                        setCapturedFile(file);
                       }
                     }}
                   />
