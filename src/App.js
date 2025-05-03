@@ -166,8 +166,6 @@ function App() {
             </div>
           </div>
 
-          
-
           {/* Upload Box */}
           <div className="lg:w-1/2 bg-white shadow-xl rounded-2xl p-8 ">
               {/* Help Icon and Modal Trigger */}
@@ -225,12 +223,12 @@ function App() {
                 )}
               </div>
 
-              {/* Capture Kamera Button - Pindahkan ke luar Dropzone */}
+              {/* kamera */}
               {!preview && (
                 <>
                   <label
                     htmlFor="cameraInput"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm cursor-pointer self-center"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm cursor-pointer self-center font-semibold"
                   >
                     Foto dengan kamera
                   </label>
@@ -629,7 +627,7 @@ function App() {
       </section>
       <footer className="w-full flex flex-col items-center justify-center px-12 py-6 bg-[#2f855a] shadow-inner mt-10">
         <img
-          src="/asset/nutri.png"
+          src="/asset/Nutri.png"
           alt="logo web"
           className="h-16 object-contain transition-transform hover:scale-110"
         />
