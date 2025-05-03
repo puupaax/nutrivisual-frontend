@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Webcam from "react-webcam";
-import { useRef} from "react";
 import { useDropzone } from "react-dropzone";
 import { useEffect } from 'react';
 
@@ -119,17 +117,6 @@ function App() {
 
   const openModal = () => setIsModalOpen(true); // Open modal function
   const closeModal = () => setIsModalOpen(false); // Close modal function
-
-  const webcamRef = useRef(null);
-  const [showCamera, setShowCamera] = useState(false);
-
-  const capture = () => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    setPreview(imageSrc);
-    setShowCamera(false);
-  };
-
-  
 
   return (
     <div className="min-h-screen bg-[#f9f9f9] font-sans">
