@@ -33,7 +33,7 @@ function App() {
   const [ageRange, setAgeRange] = useState(""); 
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: { "image/*": [] },
+    accept: { "image/*": ['.jpeg', '.jpg', '.png', '.heic', '.heif'] },
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
         const file = acceptedFiles[0];
@@ -57,7 +57,7 @@ function App() {
 
     try {
       setLoading(true);
-      const response = await axios.post("https://fastapi-production-fbed.up.railway.app/detect/", formData, {
+      const response = await axios.post("http://192.168.18.6:8000/detect/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setResults(response.data);
