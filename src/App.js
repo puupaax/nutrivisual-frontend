@@ -31,6 +31,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState(""); 
   const [ageRange, setAgeRange] = useState(""); 
+  const [visualType, setVisualType] = useState(""); 
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/*": ['.jpeg', '.jpg', '.png', '.heic', '.heif'] },
@@ -45,6 +46,7 @@ function App() {
 
   const handleGenderChange = (e) => setGender(e.target.value); 
   const handleAgeRangeChange = (e) => setAgeRange(e.target.value); 
+  const handleVisualTypeChange = (e) => setVisualType(e.target.value); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,6 +56,7 @@ function App() {
     formData.append("file", selectedFile);
     formData.append("gender", gender); 
     formData.append("age_range", ageRange); 
+    formData.append("tipe_visualisasi", visualType); 
 
     try {
       setLoading(true);
@@ -253,7 +256,7 @@ function App() {
               
 
               {/* Dropdowns */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <select
                   className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700"
                   value={gender}
@@ -280,6 +283,17 @@ function App() {
                   <option value="50_64_tahun">50–64 tahun</option>
                   <option value="65_80_tahun">65–80 tahun</option>
                   <option value="80_plus_tahun">80+ tahun</option>
+                </select>
+
+                <select
+                  className="flex-1 bg-white border border-gray-300 px-4 py-2 rounded-full text-gray-700"
+                  value={visualType}
+                  onChange={handleVisualTypeChange}
+                  required
+                >
+                  <option value="" disabled>Tipe Visualisasi</option>
+                  <option value="kemasan">per 1 Kemasan</option>
+                  <option value="sajian">per 1 Sajian</option>
                 </select>
               </div>
 
@@ -447,11 +461,24 @@ function App() {
                   <div className="w-full md:w-1/2 flex flex-col items-center text-gray-600 text-sm px-4">
                     <h2 className="font-bold mb-2 text-center">Karbohidrat setara dengan:</h2>
                     <p className="text-center">
-                    {results?.data?.karbohidrat_total ? (
-                      Math.round(42 / results.data.karbohidrat_total) === 1
-                        ? '1 porsi nasi'
-                        : `1/${Math.round(42 / results.data.karbohidrat_total)} porsi nasi`
-                    ) : '-'}
+                    {results?.data?.karbohidrat_total ? (() => {
+                      const jumlahPorsi = results.data.karbohidrat_total / 42;
+                      const integerPart = Math.floor(jumlahPorsi);
+                      const fractionalPart = jumlahPorsi - integerPart;
+                      let hasil = '';
+                      if (fractionalPart < 0.2) {
+                        hasil = `${integerPart}`;
+                      } else if (fractionalPart >= 0.2 && fractionalPart < 0.4) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¼`;
+                      } else if (fractionalPart >= 0.4 && fractionalPart < 0.6) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}½`;
+                      } else if (fractionalPart >= 0.6 && fractionalPart < 0.8) {
+                        hasil = `${integerPart > 0 ? integerPart + ' ' : ''}¾`;
+                      } else {
+                        hasil = `${integerPart + 1}`;
+                      }
+                      return hasil ? `${hasil} Porsi` : '-';
+                    })() : '-'}
                     </p>
                     {results?.perbandingan_kalori?.path && (
                       <img
