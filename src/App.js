@@ -477,7 +477,7 @@ function App() {
                       } else {
                         hasil = `${integerPart + 1}`;
                       }
-                      return hasil ? `${hasil} Porsi` : '-';
+                      return hasil ? `${hasil} Porsi nasi putih` : '-';
                     })() : '-'}
                     </p>
                     {results?.perbandingan_kalori?.path && (
