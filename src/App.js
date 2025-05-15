@@ -18,10 +18,13 @@ import {
 function App() {
 
   useEffect(() => {
+    fetch('https://fastapi-production-fbed.up.railway.app/health/')
+      .then(res=>console.log('success: ', res.status))
+      .catch(err=> console.error('gagal', err))
     document.body.classList.add('scroll-smooth');
   }, []);
 
-  const [isModalOpen, setIsModalOpen] = useState(false); // Define modal state
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [capturedFile, setCapturedFile] = useState(null);
@@ -120,8 +123,8 @@ function App() {
     { label: "Protein", value: results?.data?.protein, batas: results?.data?.batas_protein },
   ];
 
-  const openModal = () => setIsModalOpen(true); // Open modal function
-  const closeModal = () => setIsModalOpen(false); // Close modal function
+  const openModal = () => setIsModalOpen(true); // Open modal 
+  const closeModal = () => setIsModalOpen(false); // Close modal 
 
   return (
     <div className="min-h-screen bg-[#f9f9f9] font-sans">
